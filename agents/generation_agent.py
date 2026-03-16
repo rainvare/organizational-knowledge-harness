@@ -7,7 +7,7 @@ Every output includes a trace of which nodes authorized each decision.
 import json
 import os
 import re
-import google.generativeai as genai
+import google.genai as genai
 from core.graph_engine import GraphEngine
 
 
