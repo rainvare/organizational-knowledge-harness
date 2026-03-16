@@ -6,7 +6,7 @@ source field differentiates internal vs external signals (Sprint 3).
 import json, os, re
 from datetime import datetime, timezone
 from uuid import uuid4
-import google.genai as genai
+import google.generativeai as genai
 from core.graph_engine import GraphEngine
 
 COHERENCE_SYSTEM_PROMPT = """
