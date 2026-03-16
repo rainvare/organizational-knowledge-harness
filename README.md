@@ -1,4 +1,19 @@
+---
+title: Organizational Knowledge Harness
+emoji: 🕸️
+colorFrom: yellow
+colorTo: gray
+sdk: streamlit
+sdk_version: 1.32.0
+app_file: app.py
+pinned: false
+---
+
 # Organizational Knowledge Harness
+A living context engine that learns from use.
+EOF
+
+# OKH
 
 A living context engine that learns from use.
 
