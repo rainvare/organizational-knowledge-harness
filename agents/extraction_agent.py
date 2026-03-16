@@ -6,7 +6,7 @@ Converts raw organizational sources into typed nodes and edges via Gemini Flash.
 import json
 import os
 import re
-import google.generativeai as genai
+import google.genai as genai
 from core.graph_engine import GraphEngine
 
 
