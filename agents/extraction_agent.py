@@ -89,7 +89,7 @@ class ExtractionAgent:
         api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.0-flash",
             system_instruction=EXTRACTION_SYSTEM_PROMPT,
         )
 

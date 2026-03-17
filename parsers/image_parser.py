@@ -32,7 +32,7 @@ class ImageParser:
         try:
             import google.generativeai as genai
             genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.0-flash")
 
             with open(path, "rb") as f:
                 image_data = base64.b64encode(f.read()).decode("utf-8")
