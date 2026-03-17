@@ -1,62 +1,41 @@
-"""
-Image Parser — Sprint 5
-Describes images via Gemini Vision → structured text → graph.
-Prevents visual modality from being silently dropped.
-"""
+"""parsers/image_parser.py — Describes images via Groq vision (llama-3.2-11b-vision-preview)."""
 import base64
-import os
 from pathlib import Path
 
-IMAGE_PROMPT = """
-You are analyzing an image that is part of organizational brand materials.
-
-Describe what you see in structured form:
-1. What type of content is this? (logo, product photo, team photo, infographic, etc.)
-2. What brand elements are visible? (colors, typography, imagery style)
-3. What values or tone does this image communicate?
-4. Are there any text elements? Transcribe them exactly.
-5. What would be inappropriate to place next to this image?
-
-Be specific and factual. This description will be used to build a knowledge graph.
-"""
 
 class ImageParser:
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+    def __init__(self, api_key: str = ""):
+        self.api_key = api_key
 
-    def parse(self, source) -> dict:
-        path = Path(source)
-        error = None
-        text = ""
-
+    def parse(self, path: str) -> dict:
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel("gemini-2.0-flash")
+            from groq import Groq
+            img_data = Path(path).read_bytes()
+            b64 = base64.b64encode(img_data).decode()
+            suffix = Path(path).suffix.lower().lstrip(".")
+            mime = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+                    "webp": "image/webp", "gif": "image/gif"}.get(suffix, "image/jpeg")
 
-            with open(path, "rb") as f:
-                image_data = base64.b64encode(f.read()).decode("utf-8")
-
-            suffix = path.suffix.lower().lstrip(".")
-            mime_map = {"jpg": "image/jpeg", "jpeg": "image/jpeg",
-                        "png": "image/png", "gif": "image/gif", "webp": "image/webp"}
-            mime_type = mime_map.get(suffix, "image/jpeg")
-
-            response = model.generate_content([
-                IMAGE_PROMPT,
-                {"mime_type": mime_type, "data": image_data}
-            ])
-            text = response.text
-
-        except ImportError:
-            error = "Image parsing requires: pip install google-generativeai"
+            client = Groq(api_key=self.api_key)
+            response = client.chat.completions.create(
+                model="llama-3.2-11b-vision-preview",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:{mime};base64,{b64}"},
+                            },
+                            {
+                                "type": "text",
+                                "text": "Describe in detail what you see in this image, especially any text, brand elements, visual style, colors, tone, and messaging. Be precise and exhaustive.",
+                            },
+                        ],
+                    }
+                ],
+                max_tokens=1000,
+            )
+            return {"text": response.choices[0].message.content, "modality": "image"}
         except Exception as e:
-            error = str(e)
-
-        return {
-            "text": text,
-            "modality": "image",
-            "source_name": path.name,
-            "metadata": {"file_size": path.stat().st_size if path.exists() else 0},
-            **({"error": error} if error else {}),
-        }
+            return {"text": "", "error": str(e)}
