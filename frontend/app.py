@@ -64,7 +64,7 @@ if "last_coh" not in st.session_state:
 
 graph: GraphEngine = st.session_state.graph
 
-def akey(): return st.session_state.get("api_key", os.environ.get("GEMINI_API_KEY",""))
+def akey(): return st.session_state.get("api_key", os.environ.get("GROQ_API_KEY",""))
 def nm_cls(s): return {"stable":"nm-stable","watch":"nm-watch","bifurcation":"nm-bifurcation","unstable":"nm-unstable","insufficient_data":"nm-insufficient"}.get(s,"nm-insufficient")
 def ttag(t): return f'<span class="tag tag-{t}">{t}</span>'
 def sicon(s): return {"stable":"●","watch":"◐","flagged":"○"}.get(s,"?")
@@ -77,7 +77,7 @@ def scol(v):
 with st.sidebar:
     st.markdown("### 🕸️ Knowledge Harness")
     st.markdown("---")
-    k = st.text_input("Gemini API Key", value=akey(), type="password", placeholder="AIza...")
+    k = st.text_input("Groq API Key", value=akey(), type="password", placeholder="gsk_...")
     if k: st.session_state.api_key = k
     st.markdown("---")
     nm = graph.nm_graph()
@@ -113,7 +113,7 @@ with t1:
         st.markdown("""
         <div class="onboard">
         <b style="color:var(--ac);">¿Primera vez?</b><br><br>
-        1. Ingresa tu Gemini API Key en el sidebar<br>
+        1. Ingresa tu Groq API Key en el sidebar<br>
         2. Pega el contenido de tu fuente organizacional (guía de marca, valores, manual de tono)<br>
         3. Haz clic en <b>Extraer grafo</b> — el sistema construye la estructura automáticamente<br>
         4. Ve al tab <b>Grafo</b> para revisar los nodos extraídos<br>
@@ -201,7 +201,7 @@ with t1:
         if not source_text.strip():
             st.error("No hay contenido para extraer.")
         elif not akey():
-            st.error("Ingresa tu Gemini API Key en el sidebar.")
+            st.error("Ingresa tu Groq API Key en el sidebar.")
         else:
             with st.spinner("Extrayendo grafo..."):
                 agent = ExtractionAgent(graph, api_key=akey())
@@ -299,7 +299,7 @@ with t3:
 
     if st.button("Generar →",use_container_width=True):
         if not task.strip(): st.error("Describe la tarea.")
-        elif not akey(): st.error("Ingresa tu Gemini API Key.")
+        elif not akey(): st.error("Ingresa tu Groq API Key.")
         elif not graph.get_nodes(): st.error("Grafo vacío.")
         else:
             with st.spinner("Generando..."):
